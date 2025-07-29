@@ -140,11 +140,14 @@ def MAIN():
 
         #####################################
 
-        i = 0
-        dt = 0.01
-        a_i = abs(vx_loc[i]) + sqrt(g * (H_loc[i] - bx_loc[i]))
-        if dt > (cfl * dx / a_i):
-            dt = (cfl * dx / a_i)
+        a_max = 0.0
+        for j in range(1, N+1):
+            a_j = abs(vx_loc[j]) + sqrt(g * (H_loc[j] - bx_loc[j]))  
+            if a_j > a_max:
+                a_max = a_j
+
+        dt = cfl * dx / a_max
+
 
         #####################################
         
