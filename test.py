@@ -95,3 +95,6 @@ if __name__ == '__main__':
             a = val1 if val1 > val2 else val2 
             
             g_flux[:, j] = 0.5 * (fL + fR) - 0.5 * a * (u[:, j+1] - u[:, j])
+
+
+# Hallo Felix ist ein kleiner salopard
