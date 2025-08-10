@@ -127,29 +127,8 @@ def MAIN():
     u[:, 1] = (H_loc[:] - bx_loc[:]) * vx_loc[:]
     #####################################
 
-    '''
-    # Gitterpunkte berechnen (Zellzentren)
-    x_vals = np.array([x_0 + (i - 0.5) * dx for i in range(N+2)])
-    # Figure & Achsen vorbereiten
-    plt.ion()  # interaktiver Modus an
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
-    line_H, = ax1.plot(x_vals, u[:, 0], 'b-', label='H(x)')
-    line_u, = ax2.plot(x_vals, w[:, 1], 'r-', label='u(x)')
-    ax1.set_ylabel('Wasserhöhe H')
-    ax2.set_ylabel('Geschwindigkeit u')
-    ax2.set_xlabel('x')
-    ax1.grid(True)
-    ax2.grid(True)
-    ax1.legend()
-    ax2.legend()
-    '''
 
-
-
-    f_flux = np.zeros((N+2, 2))   
     g_flux = np.zeros((N+2, 2))
-    g_flux_rechts = np.zeros((N+2, 2))
-    g_flux_links =np.zeros((N+2, 2))
     u_rechts = np.zeros((N+2, 2))
     u_links = np.zeros((N+2, 2))
     slope = np.zeros(2)
@@ -230,7 +209,7 @@ def MAIN():
 
         alpha = np.zeros(2)
         alpha = np.ones(2)
-        print(u_links[:,0])
+        #print(u_links[:,0])
         for i in range(1, N+1):                                               #u_links[i+1] "Wert der von rechts kommt" ????
             alpha[0] = max(np.abs(u_rechts[i, 0] + np.sqrt(g*u_rechts[i, 0])) , np.abs(u_links[i+1, 0]) + np.sqrt(g*u_links[i+1, 0])) # -b(x) Falls Notwendig ToDo um von H auf h zu kommen (h = u[:, 0])
             alpha[1] = max(np.abs(u_rechts[i, 1] + np.sqrt(g*u_rechts[i, 0])) , np.abs(u_links[i+1, 1]) + np.sqrt(g*u_links[i+1, 0])) # -b(x) Falls Notwendig ToDo
@@ -243,16 +222,9 @@ def MAIN():
         
         u[0, :] = u[1, :]
         u[N+1] = u[N, :]
+        print(u[:,0])
         
-        '''
-            # --- Live-Plot aktualisieren ---
-        if int(t/dt) % 10 == 0:  # alle ~10 Zeitschritte
-            line_H.set_ydata(u[:, 0])
-            line_u.set_ydata(w[:, 1])
-            ax1.set_ylim(0, np.max(u[:, 0]) * 1.1)
-            ax2.set_ylim(np.min(w[:, 1]) * 1.1, np.max(w[:, 1]) * 1.1)
-            plt.pause(0.01)
-        '''
+        
         #####################################
 
         #Update der Variablen: -------------------------------------------------
