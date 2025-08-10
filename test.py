@@ -1,100 +1,57 @@
 import numpy as np
-from numpy import *
-import params
+'''
+N = 8
+x_end = 1
+x_start = -1
+
+u = np.zeros((1, N))
+u[0] = [2, 5, 4, 3, 1, 4, 2, 3]
+
+u_left = np.zeros((1, N))
+u_right = np.zeros((1, N))
+
+dx = (x_end - x_start) / N
+
+def minmod(a, b):
+    if a * b <= 0:
+        return 0
+    else:
+        return a if abs(a) < abs(b) else b
+
+for i in range(1, N-1):
+    a = u[0, i] - u[0, i-1]
+    b = u[0, i+1] - u[0, i]
+    slope = minmod(a, b)
+    u_left[0, i] = u[0, i] - slope * dx / 2
+    u_right[0, i] = u[0, i] + slope * dx / 2
+
+    u_left[0, 0] = u[0, 0]
+    u_right[0, 0] = u[0, 0]
+    u_left[0, N-1] = u[0, N-1]
+    u_right[0, N-1] = u[0, N-1]
+
+print("dx =", dx)
+print("u =", u)
+print("u_left =", u_left)
+print("u_right =", u_right)
+
+w = np.zeros((N, 3))
+print(w)
+H_loc = np.zeros(N)
+H_loc[:] = 3
+print(H_loc) 
+w[:, 0] = H_loc
+print(w)
+x = np.array([1,2,3,4,5,6,7,8])
+print(x)
+x[:] = x[:] * H_loc[:]
+print(x)
+
+l = x[1:-1]
+print(l)
+
+'''
 
 
-def MAIN():
-    # -------------------------------------------------------------------------
-    # DO NOT TOUCH START !!!!!!! 
-    # -------------------------------------------------------------------------
-
-    # Testcase:----------------------------------------------------------------
-    # const water height = 1
-    # normal dam  Break  = 2
-    testcase = params.testcase
-
-    # constant at 0m     = 1
-    # bump ground        = 2
-    ground   = params.ground 
-
-    # homogenes system   = 1
-    # inhomogenes system = 2
-    system   = params.system
-
-    # Ende der Simulation:-----------------------------------------------------
-    t_end    = params.t_end
-
-    #Hinweis: Startzeit t=0
-
-    # CFL-Bedingung:----------------------------------------------------------- 
-    cfl      = params.cfl
-
-    # Gravitationskonstante:---------------------------------------------------
-    g        = params.g
-
-    
-    # Gitter:------------------------------------------------------------------ 
-    N        = params.N
-    x_0      = params.x_0       
-    x_end    = params.x_end
-
-    # -------------------------------------------------------------------------
-    # DO NOT TOUCH ENDE !!!!!!! 
-    # -------------------------------------------------------------------------
-
-    # -------------------------------------------------------------------------
-    # Initialisierung Gitter: 
-    # -------------------------------------------------------------------------
-
-    #####################################
-    delta_x = (x_end - x_0) / 102                         
-    x_i_einhalb = linspace(-1, 1, 103)                              # 103 Wände
-    x_i = linspace((-1+ 0.5 * delta_x), (1-0.5 * delta_x), 102)     # 102 Zellen
-    #####################################   
-
-    # -------------------------------------------------------------------------
-    # Initialisierung vom Testcase 
-    # -------------------------------------------------------------------------
-
-    # Allokieren:--------------------------------------------------------------
-    H_loc  = [0] * 102
-    print(H_loc)
-    print(x_i_einhalb)
-    print(len(x_i_einhalb))
-    print(x_i)
-    print(len(x_i))
-    print(x_i[0])
-    print((x_i_einhalb[0]+ x_i_einhalb[1])/2)
-
-# -------------------------------------------------------------------------------
-# DO NOT TOUCH START !!!!!!!
-# -------------------------------------------------------------------------------
-if __name__ == '__main__':
-    MAIN()
-# -------------------------------------------------------------------------------
-# DO NOT TOUCH ENDE !!!!!!!
-# -------------------------------------------------------------------------------
-
-
-        flux = np.zeros((2, N+2))
-        g_flux = np.zeros((2, N+1))
-        flux[0, :] = u[1, :]            # hu            # Physikalischer Fluss f(U)
-        flux[1, :] = u[1, :] * w[1, :]  # hu^2
-
-        for j in range(N+1):            # Numerischer Fluss g_{j+1/2}
-            fL = flux[:, j]
-            fR = flux[:, j+1]
-
-            hL = w[0, j]
-            hR = w[0, j+1]
-            uL = w[1, j]
-            uR = w[1, j+1]
-
-            val1 = abs(uL) + sqrt(g * hL)
-            val2 = abs(uR) + sqrt(g * hR)
-            a = val1 if val1 > val2 else val2 
-            
-            g_flux[:, j] = 0.5 * (fL + fR) - 0.5 * a * (u[:, j+1] - u[:, j])
-
-
-# Hallo Felix ist ein kleiner salopard
+for i in range(6):
+    print(i)

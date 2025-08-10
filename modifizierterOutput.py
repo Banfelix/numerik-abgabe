@@ -9,9 +9,12 @@
 import numpy as np
 from numpy import *
 import testParams
+import matplotlib.pyplot as plt
+
 # -------------------------------------------------------------------------
 # DO NOT TOUCH ENDE !!!!!!! 
 # -------------------------------------------------------------------------
+
 
 
 def MAIN():
@@ -22,7 +25,7 @@ def MAIN():
     # Testcase:----------------------------------------------------------------
     # const water height = 1
     # normal dam  Break  = 2
-    testcase = 2
+    testcase = testParams.testcase
 
     # constant at 0m     = 1
     # bump ground        = 2
@@ -131,36 +134,58 @@ def MAIN():
     w[2, :] = bx_loc
 
     u[0, :] = H_loc
-    u[1, :] = (H_loc - bx_loc) * vx_loc
+    u[1, :] = (H_loc - bx_loc) * vx_loc # ist das komponentenweise??
     #####################################
-    t=0.
+    
+    # Wasserhöhe plot
+    plt.ion()
+    
+    # Geschwindigkeit plot
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    line1, = ax1.plot(x_i[1:-1], u[0, 1:-1])
+    line2, = ax2.plot(x_i[1:-1], w[1, 1:-1])
+
+    ax1.set_ylim(0, max(H_loc)*1.5)
+    ax2.set_ylim(-2, 2)
+
+    ax1.set_xlabel("x")
+    ax1.set_ylabel("Höhe")
+    ax2.set_xlabel("x")
+    ax2.set_ylabel("Geschwindigkeit")
+
+    ax1.set_title("Live Wasserhöhe H(x)")
+    ax2.set_title("Live Geschwindigkeit u(x)")
+    plt.tight_layout()
+
+    
+    
+    
+    t=0
     while t<t_end:
-
-		# Bestimmung der CFL Zahl: ----------------------------------------------
-
-        #####################################
+        
+        ##############################
+		# 1 Zeitschritt dt berechnen #
+        ##############################
 
         a_max = 0.0
-        for j in range(1, N+1):
-            a_j = abs(vx_loc[j]) + sqrt(g * (H_loc[j] - bx_loc[j]))  
+        for j in range(1, N+1):     # j geht von 1 bis N
+            a_j = abs(vx_loc[j]) + sqrt(g * (H_loc[j] - bx_loc[j]))  #loc haben 102 Einträge
             if a_j > a_max:
                 a_max = a_j
 
         dt = cfl * dx / a_max
 
 
-        #####################################
-        
-        #Zeitoperator und Raumoperator: -----------------------------------------
+        ########################################################
+        # 2 - 3 Physikalischer und numerischer Fluss berechnen #
+        ########################################################
 
-        #####################################
         flux = np.zeros((2, N+2))
         g_flux = np.zeros((2, N+1))
         flux[0, :] = u[1, :]            # hu            # Physikalischer Fluss f(U)
-        flux[1, :] = u[1, :] * w[1, :]  # hu^2
-        # flux[1, :] = u[1, :] * w[1, :] + g * u[0, :] * w[0, :]  # hu^2 + ghH 
+        flux[1, :] = u[1, :] * w[1, :]  # hu^2 
 
-        for j in range(N+1):            # Numerischer Fluss g_{j+1/2}
+        for j in range(1, N+1):            # j geht von 1 bis N
             fL = flux[:, j]
             fR = flux[:, j+1]
 
@@ -175,21 +200,33 @@ def MAIN():
             
             g_flux[:, j] = 0.5 * (fL + fR) - 0.5 * a * (u[:, j+1] - u[:, j])
         
-        #####################################
+        ###########################################################
+        # 4 - 5  Konsertvative Variable u und ghost cells updaten #
+        ###########################################################
 
-        #Update der Variablen: -------------------------------------------------
-
-        #####################################
-        for j in range(1, N+1):     
+        for j in range(1, N+1):         # j geht von 1 bis N
             u[:, j] = u[:, j] - (dt / dx) * (g_flux[:, j] - g_flux[:, j-1])         # i= 0 und i = N+1 sind die Ghost Zellen  #
         u[:, 0] = u[:, 1]       # Ghost Zellen
         u[:, N+1] = u[:, N]
         
+        ##################################
+        # 6 Primitive VAriable w updaten #
+        ##################################
+
         w[0, :] = u[0, :] - bx_loc
         w[1, :] = u[1, :] / w[0, :]
         w[2, :] = bx_loc
+        vx_loc[:] = w[1, :]
 
-        #####################################
+        #############
+        # Loop ende #
+        #############
+     
+        line1.set_ydata(u[0, 1:-1])     # Wasserhöhe
+        line2.set_ydata(w[1, 1:-1])     # Geschwindigkeit
+        ax1.set_title(f"H(x) bei t = {t:.3f}")
+        ax2.set_title(f" u(x)bei t = {t:.3f}")
+        plt.pause(0.001)
 
         # Update Zeit: ----------------------------------------------------------
         t=t+dt

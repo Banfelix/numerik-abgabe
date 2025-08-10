@@ -1,6 +1,6 @@
 testcase = 2
 
-t_end    = 0.1
+t_end    = 1
 cfl      = 0.5
 g        = 9.81
 
