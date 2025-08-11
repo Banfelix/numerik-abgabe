@@ -136,6 +136,7 @@ def MAIN():
     f_flux_links = np.zeros((N+2, 2))
     f_flux_rechts = np.zeros((N+2, 2))
 
+    plt.ion()
     t=0
     while t<t_end:
 
@@ -210,7 +211,8 @@ def MAIN():
         alpha = np.zeros(2)
         alpha = np.ones(2)
         #print(u_links[:,0])
-        for i in range(1, N+1):                                               #u_links[i+1] "Wert der von rechts kommt" ????
+        '''
+        for i in range(1, N+1):   #bis N                               #u_links[i+1] "Wert der von rechts kommt" ????
             alpha[0] = max(np.abs(u_rechts[i, 0] + np.sqrt(g*u_rechts[i, 0])) , np.abs(u_links[i+1, 0]) + np.sqrt(g*u_links[i+1, 0])) # -b(x) Falls Notwendig ToDo um von H auf h zu kommen (h = u[:, 0])
             alpha[1] = max(np.abs(u_rechts[i, 1] + np.sqrt(g*u_rechts[i, 0])) , np.abs(u_links[i+1, 1]) + np.sqrt(g*u_links[i+1, 0])) # -b(x) Falls Notwendig ToDo
             
@@ -219,7 +221,17 @@ def MAIN():
         
         for i in range(1, N+1):
             u[i, :] = u[i, :] - (dt/dx) * (g_flux[i, :] - g_flux[i-1, :])
+        '''
+        for i in range(1, N+2):             # -b(x) Falls Notwendig ToDo um von H auf h zu kommen (h = u[:, 0])
+            alpha[0] = max(np.abs(u_rechts[i-1, 0]) + np.sqrt(g*u_rechts[i-1, 0]), np.abs(u_links[i, 0]) + np.sqrt(u_links[i, 0]))
+            alpha[1] = max(np.abs(u_rechts[i-1, 1]) + np.sqrt(g*u_rechts[i-1, 0]), np.abs(u_links[i, 1]) + np.sqrt(u_links[i, 0]))
+
+            g_flux[i, 0] = 0.5 * (u_rechts[i-1, 1] + u_links[i, 1]) - 0.5 * alpha[0] * (u_links[i, 0]- u_rechts[i-1, 0])
+            g_flux[i, 1] = 0.5 * (((u_rechts[i-1, 1]**2) / u_rechts[i-1, 0]) + ((u_links[i, 1]**2) / u_links[i, 0])) - 0.5 * alpha[1] * (u_links[i, 1]- u_rechts[i-1, 1])
         
+        for i in range(1, N+1):
+            u[i, :] = u[i, :] - (dt/dx) * (g_flux[i+1, :] - g_flux[i, :])
+
         print(u[30,0])
         
         u[0, :] = u[1, :]
@@ -235,9 +247,42 @@ def MAIN():
         w[:, 2] = bx_loc[:]
         #####################################
 
+                # --- Live-Plot Debug --- #
+        plt.clf()  # aktuelle Figur leeren
+
+        # X-Koordinaten der Zellmittelpunkte
+        x_vals = np.linspace(x_0 - dx/2, x_end + dx/2, N+2)
+
+        # Absolute Höhe H = h + b
+        H_vals = w[:,0] + w[:,2]    # w[:,0] = h, w[:,2] = b
+
+        # Geschwindigkeit
+        vx_vals = w[:,1]
+
+        plt.subplot(1,2,1)
+        plt.plot(x_vals, H_vals, label='H (absolute Höhe)')
+        plt.ylim(0, max(H_vals)*1.1)
+        plt.xlabel('x')
+        plt.ylabel('H')
+        plt.title(f'Wasserhöhe (t = {t:.3f}s)')
+        plt.grid(True)
+        plt.legend()
+
+        plt.subplot(1,2,2)
+        plt.plot(x_vals, vx_vals, label='u (Geschwindigkeit)', color='r')
+        plt.ylim(min(vx_vals)*1.1, max(vx_vals)*1.1)
+        plt.xlabel('x')
+        plt.ylabel('u')
+        plt.title('Geschwindigkeit')
+        plt.grid(True)
+        plt.legend()
+
+        plt.pause(0.01)  # kurze Pause für Animation
+
         # Update Zeit: ----------------------------------------------------------
         t=t+dt
-
+    plt.ioff()
+    plt.show()
     # ---------------------------------------------------------------------------
     # DO NOT TOUCH START !!!!!!!
     # ---------------------------------------------------------------------------
