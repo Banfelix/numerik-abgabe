@@ -194,8 +194,8 @@ def MAIN():
             f_flux_rechts[i, 1] = (u_rechts[i, 1]**2) / u_rechts[i, 0]
 
             # Neue Randwerte mit halbem Zeitschritt (Rekonstruktion)
-            u_links[i, :] = u_links[i, :] - (dt / (2 * dx)) *  f_flux_rechts[i, :] - f_flux_links[i, :]                 
-            u_rechts[i, :] = u_rechts[i, :] - (dt / (2 * dx)) *  f_flux_rechts[i, :] - f_flux_links[i, :]               
+            u_links[i, :] = u_links[i, :] - (dt / (2 * dx)) *  (f_flux_rechts[i, :] - f_flux_links[i, :])                 
+            u_rechts[i, :] = u_rechts[i, :] - (dt / (2 * dx)) *  (f_flux_rechts[i, :] - f_flux_links[i, :])               
         
         #Beide Ränder der linken Ghost Zelle
         u_rechts[0, :] = u_links[1, :]   
@@ -215,14 +215,12 @@ def MAIN():
             alpha[1] = max(np.abs(u_rechts[i, 1] + np.sqrt(g*u_rechts[i, 0])) , np.abs(u_links[i+1, 1]) + np.sqrt(g*u_links[i+1, 0])) # -b(x) Falls Notwendig ToDo
             
             g_flux[i, 0] = 0.5 * (u_rechts[i, 1] + u_links[i+1, 1]) - 0.5 * alpha[0] * (u_links[i+1, 0] - u_rechts[i, 0])
-            g_flux[i, 1] = 0.5 * ((u_rechts[i, 1]**2) / u_rechts[i, 0] + (u_links[i+1, 1]**2) / u_rechts[i, 0]) - 0.5 * alpha[0] * (u_links[i+1, 0] - u_rechts[i, 0]) # -b(x) Falls Notwendig ToDo
+            g_flux[i, 1] = 0.5 * ((u_rechts[i, 1]**2) / u_rechts[i, 0] + (u_links[i+1, 1]**2) / u_links[i, 0]) - 0.5 * alpha[1] * (u_links[i+1, 0] - u_rechts[i, 0]) # -b(x) Falls Notwendig ToDo
         
         for i in range(1, N+1):
             u[i, :] = u[i, :] - (dt/dx) * (g_flux[i, :] - g_flux[i-1, :])
         
-        u[0, :] = u[1, :]
-        u[N+1] = u[N, :]
-        print(u[:,0])
+        print(u[30,0])
         
         
         #####################################
@@ -237,9 +235,6 @@ def MAIN():
 
         # Update Zeit: ----------------------------------------------------------
         t=t+dt
-
-    plt.ioff()
-    plt.show()
 
     # ---------------------------------------------------------------------------
     # DO NOT TOUCH START !!!!!!!
