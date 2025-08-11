@@ -169,8 +169,8 @@ def MAIN():
                 else:
                     slope[k] = delta_links if abs(delta_links) < abs(delta_rechts) else delta_rechts
 
-            u_links[i, :] = u[i, :] - 0.5 * dx * slope[:]
-            u_rechts[i, :] = u[i, :] + 0.5 * dx * slope[:]
+            u_links[i, :] = u[i, :] - 0.5 * slope[:]
+            u_rechts[i, :] = u[i, :] + 0.5 * slope[:]
         
         #Beide Ränder der linken Ghost Zelle
         u_rechts[0, :] = u_links[1, :]   
@@ -215,13 +215,15 @@ def MAIN():
             alpha[1] = max(np.abs(u_rechts[i, 1] + np.sqrt(g*u_rechts[i, 0])) , np.abs(u_links[i+1, 1]) + np.sqrt(g*u_links[i+1, 0])) # -b(x) Falls Notwendig ToDo
             
             g_flux[i, 0] = 0.5 * (u_rechts[i, 1] + u_links[i+1, 1]) - 0.5 * alpha[0] * (u_links[i+1, 0] - u_rechts[i, 0])
-            g_flux[i, 1] = 0.5 * ((u_rechts[i, 1]**2) / u_rechts[i, 0] + (u_links[i+1, 1]**2) / u_links[i, 0]) - 0.5 * alpha[1] * (u_links[i+1, 0] - u_rechts[i, 0]) # -b(x) Falls Notwendig ToDo
+            g_flux[i, 1] = 0.5 * ((u_rechts[i, 1]**2) / u_rechts[i, 0] + (u_links[i+1, 1]**2) / u_links[i+1, 0]) - 0.5 * alpha[1] * (u_links[i+1, 0] - u_rechts[i, 0]) # -b(x) Falls Notwendig ToDo
         
         for i in range(1, N+1):
             u[i, :] = u[i, :] - (dt/dx) * (g_flux[i, :] - g_flux[i-1, :])
         
         print(u[30,0])
         
+        u[0, :] = u[1, :]
+        u[N+1] = u[N, :]
         
         #####################################
 
